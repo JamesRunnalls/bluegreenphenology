@@ -27,6 +27,20 @@ a:hover {
   top: 0;
 }
 
+.logos {
+  position: fixed;
+  bottom: 20px;
+  right: 10px;
+  z-index: 899;
+}
+
+.logos img {
+  max-height: 60px;
+  max-width: 1200px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
 .side-bar {
   position: absolute;
   height: 100vh;
@@ -35,13 +49,17 @@ a:hover {
   max-width: 100%;
   left: 0;
   top: 0;
-  background-color: white;
   box-shadow: 0 0 20px rgb(0 0 0 / 30%);
   z-index: 900;
 }
 
 .side-bar.hide {
   display: none;
+}
+
+.side-bar .content {
+  background-color: white;
+  min-height: calc(100vh - 256px);
 }
 
 .side-bar .header {
@@ -58,6 +76,65 @@ a:hover {
   font-size: 30px;
 }
 
+.side-bar .info .text {
+  font-size: 16px;
+  color: darkgray;
+  margin-top: 5px;
+}
+
+.side-bar .info .legend {
+  font-size: 16px;
+  color: darkgray;
+}
+
+@media screen and (max-width: 900px) {
+  .side-bar {
+    width: 100%;
+    box-shadow: none;
+    pointer-events: none;
+  }
+  .side-bar .header {
+    background-color: transparent;
+    height: 65vh;
+  }
+
+  .side-bar .content {
+    min-height: 35vh;
+    pointer-events: all;
+  }
+
+  .side-bar .text {
+    background-color: white;
+  }
+
+  .side-bar .legend {
+    background-color: white;
+  }
+
+  .side-bar .images {
+    background-color: white;
+  }
+}
+
+.square {
+  margin: 5px 10px;
+  width: 30px;
+  height: 15px;
+  fill-opacity: 0.5;
+  color: black;
+  background-color: black;
+}
+
+.red.square {
+  color: red;
+  background-color: red;
+}
+
+.yellow.square {
+  color: yellow;
+  background-color: yellow;
+}
+
 .side-bar .images {
   width: 100%;
 }
@@ -66,6 +143,25 @@ a:hover {
   width: 100%;
   margin: 10px 0px;
   cursor: pointer;
+}
+
+.side-bar .images .fullscreen {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+
+.side-bar .images .fullscreen img {
+  max-width: 90%;
+  max-height: 90%;
+  width: auto;
+  height: auto;
+  top: 50%;
+  transform: translateY(50%);
 }
 
 .search-bar {
@@ -105,6 +201,10 @@ a:hover {
 .css-2b097c-container {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgb(0 0 0 / 20%), 0 -1px 0px rgb(0 0 0 / 2%);
+}
+
+.css-1wa3eu0-placeholder {
+  font-size: 15px !important;
 }
 
 .css-yk16xz-control {

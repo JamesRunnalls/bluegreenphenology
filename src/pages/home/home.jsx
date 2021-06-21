@@ -7,10 +7,36 @@ import "./css/leaflet.css";
 import "./css/markercluster.css";
 import "./css/markerclusterdefault.css";
 import "../../App.css";
+import eawag from "./img/logo_eawag.png";
+import wsl from "./img/logo_wsl.png";
+
+class Image extends Component {
+  state = { fullscreen: false };
+  fullscreen = () => {
+    if (!this.state.fullscreen) this.setState({ fullscreen: true });
+  };
+  close = () => {
+    if (this.state.fullscreen) this.setState({ fullscreen: false });
+  };
+  render() {
+    var { id, name, base_url } = this.props;
+    var { fullscreen } = this.state;
+    return (
+      <div className={fullscreen ? "fullscreen" : ""} onClick={this.close}>
+        <img
+          alt={name}
+          title="View Large Image"
+          src={`${base_url}/Lake_${id}_${name}.png`}
+          onError={(i) => (i.target.style.display = "none")}
+          onClick={this.fullscreen}
+        />
+      </div>
+    );
+  }
+}
 
 class ShowImages extends Component {
   state = {
-    base_url: "https://bluegreenphenology.s3.eu-central-1.amazonaws.com",
     img_names: [
       "wShedDistReg",
       "lakePhenoMETDistReg",
@@ -31,20 +57,13 @@ class ShowImages extends Component {
     this.setState({ img_names });
   };
   render() {
-    var { id } = this.props;
-    var { base_url, img_names } = this.state;
+    var { id, base_url } = this.props;
+    var { img_names } = this.state;
     if (id !== false) {
       return (
         <React.Fragment>
           {img_names.map((i) => (
-            <img
-              className=""
-              key={id + i}
-              alt={i}
-              title="View Large Image"
-              src={`${base_url}/Lake_${id}_${i}.png`}
-              onError={(i) => (i.target.style.display = "none")}
-            />
+            <Image id={id} name={i} base_url={base_url} key={id + i} />
           ))}
         </React.Fragment>
       );
@@ -57,35 +76,147 @@ class ShowImages extends Component {
 class Home extends Component {
   state = {
     lake: false,
+    show_lake: true,
+    show_watershed: true,
     lakes: [],
     options: [],
     data: [],
     noname: { value: -1, label: "Unnamed Lake" },
     sidebar: 408,
+    base_url: "https://bluegreenphenology.s3.eu-central-1.amazonaws.com",
+    properties: false,
   };
-  setLakeSelect = (event) => {
-    if (event === null) {
-      this.setState({ lake: false });
+
+  toggleShowLake = () => {
+    var { show_lake } = this.state;
+    try {
+      if (show_lake) {
+        this.map.removeLayer(this.lake);
+      } else {
+        this.map.addLayer(this.lake);
+      }
+    } catch (e) {}
+    this.setState({ show_lake: !show_lake });
+  };
+
+  toggleShowWatershed = () => {
+    var { show_watershed } = this.state;
+    try {
+      if (show_watershed) {
+        this.map.removeLayer(this.watershed);
+      } else {
+        this.map.addLayer(this.watershed);
+      }
+    } catch (e) {}
+    this.setState({ show_watershed: !this.state.show_watershed });
+  };
+
+  processText = (p, name) => {
+    if (p) {
+      return `${name} covers a surface area of ${Math.round(
+        p.lake_area
+      )}km² and is part of the following countries; ${p.countries.join(
+        ", "
+      )}. The watershed covers an area of ${Math.round(
+        p.watershed_area / 1000000
+      )}km².`;
     } else {
-      var { lakes, sidebar } = this.state;
-      var latlng = lakes.find((d) => d.id === event.value).coords;
+      return "";
+    }
+  };
+
+  downloadLakeMetadata = async (id) => {
+    const { base_url } = this.state;
+    try {
+      const { data } = await axios.get(base_url + "/" + id + "_metadata.json");
+      return data;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  plotZoomLake = (data, latlng) => {
+    var { sidebar } = this.state;
+    if (data) {
+      this.lake = L.geoJSON(data["features"][1], {
+        style: function (feature) {
+          return {
+            fillColor: feature["properties"]["fill"],
+            weight: feature["properties"]["stroke-width"],
+            opacity: feature["properties"]["stroke-opacity"],
+            color: feature["properties"]["stroke"],
+            fillOpacity: feature["properties"]["fill-opacity"],
+          };
+        },
+      });
+      this.watershed = L.geoJSON(data["features"][0], {
+        style: function (feature) {
+          return {
+            fillColor: feature["properties"]["fill"],
+            weight: feature["properties"]["stroke-width"],
+            opacity: feature["properties"]["stroke-opacity"],
+            color: feature["properties"]["stroke"],
+            fillOpacity: feature["properties"]["fill-opacity"],
+          };
+        },
+      });
+      this.map.addLayer(this.watershed);
+      this.map.addLayer(this.lake);
+      var bounds = this.watershed.getBounds();
+      this.map.fitBounds(bounds);
+    } else {
       var pr = this.map.project(latlng, 9);
       pr.x = pr.x - sidebar / 2;
       this.map.flyTo(this.map.unproject(pr, 9), 9);
-      this.setState({ lake: event.value });
     }
   };
+
+  setLakeSelect = (event) => {
+    try {
+      this.map.removeLayer(this.lake);
+      this.map.removeLayer(this.watershed);
+    } catch (e) {}
+    if (event === null) {
+      this.setState({ lake: false, properties: false });
+    } else {
+      var { lakes } = this.state;
+      var latlng = lakes.find((d) => d.id === event.value).coords;
+
+      this.setState({ lake: event.value }, async () => {
+        var data = await this.downloadLakeMetadata(event.value);
+        this.plotZoomLake(data, latlng);
+        if (data) {
+          var properties = {
+            countries: data["features"][1]["properties"]["countries"],
+            lake_area: data["features"][1]["properties"]["area"],
+            watershed_area: data["features"][0]["properties"]["area"],
+          };
+          this.setState({ properties, show_lake: true, show_watershed: true });
+        }
+      });
+    }
+  };
+
   setLakeLeaflet = (e) => {
-    var { sidebar } = this.state;
+    try {
+      this.map.removeLayer(this.lake);
+      this.map.removeLayer(this.watershed);
+    } catch (e) {}
     var latlng = e.latlng;
-    var px = this.map.project(latlng).x - this.map.getPixelBounds().min.x;
-    if (px < this.state.sidebar) {
-      var pr = this.map.project(latlng);
-      pr.x = pr.x - sidebar / 2;
-      this.map.flyTo(this.map.unproject(pr));
-    }
-    this.setState({ lake: e.target.options.id });
+    this.setState({ lake: e.target.options.id }, async () => {
+      var data = await this.downloadLakeMetadata(e.target.options.id);
+      this.plotZoomLake(data, latlng);
+      if (data) {
+        var properties = {
+          countries: data["features"][1]["properties"]["countries"],
+          lake_area: data["features"][1]["properties"]["area"],
+          watershed_area: data["features"][0]["properties"]["area"],
+        };
+        this.setState({ properties, show_lake: true, show_watershed: true });
+      }
+    });
   };
+
   plotLakes = (data) => {
     var markers = L.markerClusterGroup();
     var icon = L.divIcon({
@@ -98,12 +229,16 @@ class Home extends Component {
           icon: icon,
           id: lake.id,
         })
-          .bindTooltip(lake.name)
+          .bindTooltip(lake.name === "None" ? "Unnamed Lake" : lake.name, {
+            direction: "top",
+            offset: L.point(0, -5),
+          })
           .on("click", this.setLakeLeaflet)
       );
     }
     this.map.addLayer(markers);
   };
+
   parseOptions = (data) => {
     var options = data
       .filter((d) => d.name !== "None")
@@ -113,11 +248,11 @@ class Home extends Component {
     options.push(this.state.noname);
     return options;
   };
+
   getLakes = async () => {
+    const { base_url } = this.state;
     const { data } = await axios
-      .get(
-        "https://bluegreenphenology.s3.eu-central-1.amazonaws.com/lakes.json"
-      )
+      .get(base_url + "/lakes.json")
       .catch((error) => {
         console.error(error);
       });
@@ -152,11 +287,19 @@ class Home extends Component {
   }
 
   render() {
-    document.title =
-      "Global remotely sensed phenology of Blue-Green Ecosystems";
-    const { lake, options, noname } = this.state;
+    document.title = "Global Phenology Map of Blue-Green Ecosystems";
+    const {
+      lake,
+      options,
+      noname,
+      base_url,
+      properties,
+      show_lake,
+      show_watershed,
+    } = this.state;
     var option = options.find((item) => item.value === lake);
     if (option === undefined && lake !== false) option = noname;
+    var text = this.processText(properties, option ? option.label : "");
     return (
       <React.Fragment>
         <div className="map">
@@ -164,11 +307,46 @@ class Home extends Component {
         </div>
         <div className={lake ? "side-bar" : "side-bar hide"}>
           <div className="header"></div>
-          <div className="info">
-            <div className="title">{option && option.label}</div>
-          </div>
-          <div className="images">
-            <ShowImages id={lake} />
+          <div className="content">
+            <div className="info">
+              <div className="title">{option && option.label}</div>
+              <div className="text">{text}</div>
+              <div className="legend">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <input
+                          type="checkbox"
+                          onChange={this.toggleShowLake}
+                          checked={show_lake}
+                        />
+                      </td>
+                      <td>
+                        <div className="yellow square" />
+                      </td>
+                      <td>Lake Surface Area</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input
+                          type="checkbox"
+                          onChange={this.toggleShowWatershed}
+                          checked={show_watershed}
+                        />
+                      </td>
+                      <td>
+                        <div className="red square" />
+                      </td>
+                      <td>Watershed Area</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="images">
+              <ShowImages id={lake} base_url={base_url} />
+            </div>
           </div>
         </div>
         <div className="search-bar">
@@ -179,6 +357,22 @@ class Home extends Component {
             isClearable={true}
             value={option}
           />
+        </div>
+        <div className="logos">
+          <a
+            href="https://www.eawag.ch/en/department/surf/projects/phenology-of-blue-green-ecosystems/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={eawag} alt="Eawag" />
+          </a>
+          <a
+            href="https://www.wsl.ch/de/projekte/how-will-changes-in-the-phenology-of-species-affect-the-biodiversity-of-lakes-and-their-surrounding-watersheds.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={wsl} alt="WSL" />
+          </a>
         </div>
       </React.Fragment>
     );
