@@ -93,6 +93,9 @@ a:hover {
     box-shadow: none;
     pointer-events: none;
   }
+  .side-bar.pointers{
+    pointer-events: all;
+  }
   .side-bar .header {
     background-color: transparent;
     height: 65vh;

@@ -85,6 +85,15 @@ class Home extends Component {
     sidebar: 408,
     base_url: "https://bluegreenphenology.s3.eu-central-1.amazonaws.com",
     properties: false,
+    map_active: true,
+  };
+
+  activateMap = () => {
+    this.setState({ map_active: true });
+  };
+
+  deactivateMap = () => {
+    this.setState({ map_active: false });
   };
 
   toggleShowLake = () => {
@@ -296,18 +305,24 @@ class Home extends Component {
       properties,
       show_lake,
       show_watershed,
+      map_active,
     } = this.state;
     var option = options.find((item) => item.value === lake);
     if (option === undefined && lake !== false) option = noname;
     var text = this.processText(properties, option ? option.label : "");
+    var side =
+      "side-bar" + (lake ? "" : " hide") + (!map_active ? " pointers" : "");
     return (
       <React.Fragment>
         <div className="map">
           <div id="map" />
         </div>
-        <div className={lake ? "side-bar" : "side-bar hide"}>
-          <div className="header"></div>
-          <div className="content">
+        <div className={side}>
+          <div
+            className={map_active ? "header pointers" : "header"}
+            onMouseEnter={this.activateMap}
+          ></div>
+          <div className="content" onMouseEnter={this.deactivateMap}>
             <div className="info">
               <div className="title">{option && option.label}</div>
               <div className="text">{text}</div>
