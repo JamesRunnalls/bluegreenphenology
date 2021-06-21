@@ -89,11 +89,11 @@ class Home extends Component {
   };
 
   activateMap = () => {
-    this.setState({ map_active: true });
+    if (!this.state.map_active) this.setState({ map_active: true });
   };
 
   deactivateMap = () => {
-    this.setState({ map_active: false });
+    if (this.state.map_active) this.setState({ map_active: false });
   };
 
   toggleShowLake = () => {
@@ -321,8 +321,19 @@ class Home extends Component {
           <div
             className={map_active ? "header pointers" : "header"}
             onMouseEnter={this.activateMap}
+            onClick={this.activateMap}
+            onDrag={this.activateMap}
+            onMouseOver={this.activateMap}
+            onTouchMove={this.activateMap}
           ></div>
-          <div className="content" onMouseEnter={this.deactivateMap}>
+          <div
+            className="content"
+            onMouseEnter={this.deactivateMap}
+            onClick={this.deactivateMap}
+            onDrag={this.deactivateMap}
+            onMouseOver={this.deactivateMap}
+            onTouchMove={this.deactivateMap}
+          >
             <div className="info">
               <div className="title">{option && option.label}</div>
               <div className="text">{text}</div>
