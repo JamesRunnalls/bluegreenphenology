@@ -11,7 +11,10 @@ import eawag from "./img/logo_eawag.png";
 import wsl from "./img/logo_wsl.png";
 
 class Image extends Component {
-  state = { fullscreen: false };
+  state = { fullscreen: false, display: true };
+  hide = () => {
+    this.setState({ display: false });
+  };
   fullscreen = () => {
     if (!this.state.fullscreen) this.setState({ fullscreen: true });
   };
@@ -19,51 +22,107 @@ class Image extends Component {
     if (this.state.fullscreen) this.setState({ fullscreen: false });
   };
   render() {
-    var { id, name, base_url } = this.props;
-    var { fullscreen } = this.state;
-    return (
-      <div className={fullscreen ? "fullscreen" : ""} onClick={this.close}>
-        <img
-          alt={name}
-          title="View Large Image"
-          src={`${base_url}/Lake_${id}_${name}.png`}
-          onError={(i) => (i.target.style.display = "none")}
-          onClick={this.fullscreen}
-        />
-      </div>
-    );
+    var { id, name, base_url, info, title } = this.props;
+    var { fullscreen, display } = this.state;
+    if (display) {
+      return (
+        <div
+          className={fullscreen ? "image fullscreen" : "image"}
+          onClick={this.close}
+        >
+          <div className="title">{title}</div>
+          <img
+            alt={name}
+            title="View Large Image"
+            src={`${base_url}/Lake_${id}_${name}.png`}
+            onError={this.hide}
+            onClick={this.fullscreen}
+          />
+          <div className="infobox">{info}</div>
+        </div>
+      );
+    } else {
+      return <React.Fragment></React.Fragment>;
+    }
   }
 }
 
 class ShowImages extends Component {
   state = {
-    img_names: [
-      "wShedDistReg",
-      "lakePhenoMETDistReg",
-      "lakePhenoMETLakeFrac",
-      "scatterLakeStartEndPeak",
-      "scatterLakeStartEndPeak_simClust",
-      "lakePhenoMETLakeFrac_1",
-      "lakePhenoMETLakeFrac_2",
-      "lakePhenoMETLakeFrac_3",
-      "lakePhenoMETLakeFrac_4",
-      "lakePhenoMETLakeFrac_5",
+    images: [
+      {
+        name: "wShedDistReg",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "lakePhenoMETDistReg",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "lakePhenoMETLakeFrac",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "scatterLakeStartEndPeak",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "scatterLakeStartEndPeak_simClust",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "lakePhenoMETLakeFrac_1",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "lakePhenoMETLakeFrac_2",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "lakePhenoMETLakeFrac_3",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "lakePhenoMETLakeFrac_4",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
+      {
+        name: "lakePhenoMETLakeFrac_5",
+        title: "Some title. To be provided by Jelle.",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
     ],
   };
   onError = (e) => {
-    var { img_names } = this.state;
+    var { images } = this.state;
     var name = e.target.alt;
-    img_names = img_names.filter((i) => i !== name);
-    this.setState({ img_names });
+    images = images.filter((i) => i !== name);
+    this.setState({ images });
   };
   render() {
     var { id, base_url } = this.props;
-    var { img_names } = this.state;
+    var { images } = this.state;
     if (id !== false) {
       return (
         <React.Fragment>
-          {img_names.map((i) => (
-            <Image id={id} name={i} base_url={base_url} key={id + i} />
+          {images.map((i) => (
+            <Image
+              id={id}
+              name={i.name}
+              base_url={base_url}
+              key={id + i.name}
+              info={i.info}
+              title={i.title}
+            />
           ))}
         </React.Fragment>
       );
@@ -86,6 +145,7 @@ class Home extends Component {
     base_url: "https://bluegreenphenology.s3.eu-central-1.amazonaws.com",
     properties: false,
     map_active: true,
+    modal: true,
   };
 
   activateMap = () => {
@@ -94,6 +154,10 @@ class Home extends Component {
 
   deactivateMap = () => {
     if (this.state.map_active) this.setState({ map_active: false });
+  };
+
+  closeModal = () => {
+    this.setState({ modal: false });
   };
 
   toggleShowLake = () => {
@@ -306,6 +370,7 @@ class Home extends Component {
       show_lake,
       show_watershed,
       map_active,
+      modal,
     } = this.state;
     var option = options.find((item) => item.value === lake);
     if (option === undefined && lake !== false) option = noname;
@@ -314,6 +379,29 @@ class Home extends Component {
       "side-bar" + (lake ? "" : " hide") + (!map_active ? " pointers" : "");
     return (
       <React.Fragment>
+        {modal && (
+          <div className="modal" onClick={this.closeModal}>
+            <div className="modal-inner">
+              <h2>Global Phenology Map of Blue-Green Ecosystems.</h2>
+              <div className="modal-text">
+                <p>
+                  This project contributes to the{" "}
+                  <a href="https://www.eawag.ch/en/research/water-for-ecosystem/biodiversity/blue-green-biodiversity-research-initiative/">
+                    Blue Green Biodiversity Research Initiative
+                  </a>{" "}
+                  – an Eawag-WSL collaboration focusing on Biodiversity at the
+                  interface of aquatic and terrestrial ecosystems.
+                </p>
+                <p>
+                  On this page you can find a comparison of the phenology
+                  between more than 4000 lakes and their watersheds.
+                </p>
+              </div>
+              <h5>Click anywhere to start.</h5>
+            </div>
+          </div>
+        )}
+
         <div className="map">
           <div id="map" />
         </div>
