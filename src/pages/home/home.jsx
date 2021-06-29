@@ -52,52 +52,52 @@ class ShowImages extends Component {
     images: [
       {
         name: "wShedDistReg",
-        title: "Some title. To be provided by Jelle.",
+        title: "Land phenology",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "lakePhenoMETDistReg",
-        title: "Some title. To be provided by Jelle.",
+        title: "Lake phenology",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "lakePhenoMETLakeFrac",
-        title: "Some title. To be provided by Jelle.",
+        title: "Bloom size (fraction of pixels) per year",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "scatterLakeStartEndPeak",
-        title: "Some title. To be provided by Jelle.",
+        title: "Timing of chlorophyll in- and decrease",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "scatterLakeStartEndPeak_simClust",
-        title: "Some title. To be provided by Jelle.",
+        title: "Clusters of overlap in timing",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "lakePhenoMETLakeFrac_1",
-        title: "Some title. To be provided by Jelle.",
+        title: "Cluster 1",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "lakePhenoMETLakeFrac_2",
-        title: "Some title. To be provided by Jelle.",
+        title: "Cluster 2",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "lakePhenoMETLakeFrac_3",
-        title: "Some title. To be provided by Jelle.",
+        title: "Cluster 3",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "lakePhenoMETLakeFrac_4",
-        title: "Some title. To be provided by Jelle.",
+        title: "Cluster 4",
         info: "Some information about the plot. To be provided by Jelle.",
       },
       {
         name: "lakePhenoMETLakeFrac_5",
-        title: "Some title. To be provided by Jelle.",
+        title: "Cluster 5",
         info: "Some information about the plot. To be provided by Jelle.",
       },
     ],
@@ -214,10 +214,10 @@ class Home extends Component {
       this.lake = L.geoJSON(data["features"][1], {
         style: function (feature) {
           return {
-            fillColor: feature["properties"]["fill"],
+            fillColor: "red",
             weight: feature["properties"]["stroke-width"],
             opacity: feature["properties"]["stroke-opacity"],
-            color: feature["properties"]["stroke"],
+            color: "red",
             fillOpacity: feature["properties"]["fill-opacity"],
           };
         },
@@ -225,10 +225,10 @@ class Home extends Component {
       this.watershed = L.geoJSON(data["features"][0], {
         style: function (feature) {
           return {
-            fillColor: feature["properties"]["fill"],
+            fillColor: "yellow",
             weight: feature["properties"]["stroke-width"],
             opacity: feature["properties"]["stroke-opacity"],
-            color: feature["properties"]["stroke"],
+            color: "yellow",
             fillOpacity: feature["properties"]["fill-opacity"],
           };
         },
@@ -363,6 +363,7 @@ class Home extends Component {
     document.title = "Global Phenology Map of Blue-Green Ecosystems";
     const {
       lake,
+      lakes,
       options,
       noname,
       base_url,
@@ -372,6 +373,9 @@ class Home extends Component {
       map_active,
       modal,
     } = this.state;
+    var lakeInfo = lakes.find((item) => item.id === lake);
+    var id_str = "";
+    if (lakeInfo) id_str = lakeInfo.id_str;
     var option = options.find((item) => item.value === lake);
     if (option === undefined && lake !== false) option = noname;
     var text = this.processText(properties, option ? option.label : "");
@@ -424,6 +428,7 @@ class Home extends Component {
           >
             <div className="info">
               <div className="title">{option && option.label}</div>
+              <div className="id">{id_str}</div>
               <div className="text">{text}</div>
               <div className="legend">
                 <table>
@@ -437,7 +442,7 @@ class Home extends Component {
                         />
                       </td>
                       <td>
-                        <div className="yellow square" />
+                        <div className="red square" />
                       </td>
                       <td>Lake Surface Area</td>
                     </tr>
@@ -450,7 +455,7 @@ class Home extends Component {
                         />
                       </td>
                       <td>
-                        <div className="red square" />
+                        <div className="yellow square" />
                       </td>
                       <td>Watershed Area</td>
                     </tr>
