@@ -417,7 +417,8 @@ class Home extends Component {
             onDrag={this.activateMap}
             onMouseOver={this.activateMap}
             onTouchMove={this.activateMap}
-          ></div>
+          >
+          </div>
           <div
             className="content"
             onMouseEnter={this.deactivateMap}
