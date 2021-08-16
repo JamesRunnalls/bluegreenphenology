@@ -9,6 +9,7 @@ import "./css/markerclusterdefault.css";
 import "../../App.css";
 import eawag from "./img/logo_eawag.png";
 import wsl from "./img/logo_wsl.png";
+import ply from "./img/logo_ply.png";
 
 class Image extends Component {
   state = { fullscreen: false, display: true };
@@ -33,7 +34,7 @@ class Image extends Component {
           <div className="title">{title}</div>
           <img
             alt={name}
-            title="View Large Image"
+            title={fullscreen ? "Close Image" : "View Large Image"}
             src={`${base_url}/Lake_${id}_${name}.png`}
             onError={this.hide}
             onClick={this.fullscreen}
@@ -314,9 +315,8 @@ class Home extends Component {
 
   parseOptions = (data) => {
     var options = data
-      .filter((d) => d.name !== "None")
       .map((d) => {
-        return { value: d.id, label: d.name };
+        return { value: d.id, label: d.name === "None" ? "Lake ID: " + d.id : d.name + " (ID: " + d.id + ")"};
       });
     options.push(this.state.noname);
     return options;
@@ -347,6 +347,7 @@ class Home extends Component {
           "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
       }
     ).addTo(this.map);
+    new L.Control.Zoom({ position: "topright" }).addTo(this.map);
     window.setTimeout(() => {
       this.getLakes();
     }, 0);
@@ -417,8 +418,7 @@ class Home extends Component {
             onDrag={this.activateMap}
             onMouseOver={this.activateMap}
             onTouchMove={this.activateMap}
-          >
-          </div>
+          ></div>
           <div
             className="content"
             onMouseEnter={this.deactivateMap}
@@ -492,6 +492,13 @@ class Home extends Component {
             rel="noopener noreferrer"
           >
             <img src={wsl} alt="WSL" />
+          </a>
+          <a
+            href="https://www.pml.ac.uk/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={ply} alt="Plymouth Marine Laboratory" />
           </a>
         </div>
       </React.Fragment>
