@@ -101,6 +101,11 @@ class ShowImages extends Component {
         title: "Cluster 5",
         info: "Some information about the plot. To be provided by Jelle.",
       },
+      {
+        name: "timeseries",
+        title: "Timeseries",
+        info: "Some information about the plot. To be provided by Jelle.",
+      },
     ],
   };
   onError = (e) => {
@@ -314,10 +319,15 @@ class Home extends Component {
   };
 
   parseOptions = (data) => {
-    var options = data
-      .map((d) => {
-        return { value: d.id, label: d.name === "None" ? "Lake ID: " + d.id : d.name + " (ID: " + d.id + ")"};
-      });
+    var options = data.map((d) => {
+      return {
+        value: d.id,
+        label:
+          d.name === "None"
+            ? "Lake ID: " + d.id
+            : d.name + " (ID: " + d.id + ")",
+      };
+    });
     options.push(this.state.noname);
     return options;
   };
