@@ -10,6 +10,7 @@ import "../../App.css";
 import eawag from "./img/logo_eawag.png";
 import wsl from "./img/logo_wsl.png";
 import ply from "./img/logo_ply.png";
+import beta from "./img/beta.png";
 
 class Image extends Component {
   state = { fullscreen: false, display: true };
@@ -411,6 +412,7 @@ class Home extends Component {
                   On this page you can find a comparison of the phenology
                   between more than 4000 lakes and their watersheds.
                 </p>
+                <p>*This is a beta version.</p>
               </div>
               <h5>Click anywhere to start.</h5>
             </div>
@@ -419,6 +421,12 @@ class Home extends Component {
 
         <div className="map">
           <div id="map" />
+          <img
+            src={beta}
+            className="beta"
+            title="The data contained in this site is still a beta version."
+            alt="BETA"
+          />
         </div>
         <div className={side}>
           <div
@@ -490,11 +498,11 @@ class Home extends Component {
         </div>
         <div className="logos">
           <a
-            href="https://www.eawag.ch/en/department/surf/projects/phenology-of-blue-green-ecosystems/"
+            href="https://www.pml.ac.uk/"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src={eawag} alt="Eawag" />
+            <img src={ply} alt="Plymouth Marine Laboratory" />
           </a>
           <a
             href="https://www.wsl.ch/de/projekte/how-will-changes-in-the-phenology-of-species-affect-the-biodiversity-of-lakes-and-their-surrounding-watersheds.html"
@@ -504,12 +512,13 @@ class Home extends Component {
             <img src={wsl} alt="WSL" />
           </a>
           <a
-            href="https://www.pml.ac.uk/"
+            href="https://www.eawag.ch/en/department/surf/projects/phenology-of-blue-green-ecosystems/"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src={ply} alt="Plymouth Marine Laboratory" />
+            <img src={eawag} alt="Eawag" />
           </a>
+          <div className="contact">For more information, please contact jelle.lever@eawag.ch</div>
         </div>
       </React.Fragment>
     );
