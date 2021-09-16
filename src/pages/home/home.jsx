@@ -55,57 +55,52 @@ class ShowImages extends Component {
       {
         name: "wShedDistReg",
         title: "Land phenology",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "lakePhenoMETDistReg",
         title: "Lake phenology",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "lakePhenoMETLakeFrac",
         title: "Bloom size (fraction of pixels) per year",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "scatterLakeStartEndPeak",
         title: "Timing of chlorophyll in- and decrease",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "scatterLakeStartEndPeak_simClust",
         title: "Clusters of overlap in timing",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "lakePhenoMETLakeFrac_1",
         title: "Cluster 1",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "lakePhenoMETLakeFrac_2",
         title: "Cluster 2",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "lakePhenoMETLakeFrac_3",
         title: "Cluster 3",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "lakePhenoMETLakeFrac_4",
         title: "Cluster 4",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
       {
         name: "lakePhenoMETLakeFrac_5",
         title: "Cluster 5",
-        info: "Some information about the plot. To be provided by Jelle.",
-      },
-      {
-        name: "timeseries",
-        title: "Timeseries",
-        info: "Some information about the plot. To be provided by Jelle.",
+        info: "",
       },
     ],
   };
@@ -344,6 +339,7 @@ class Home extends Component {
     const options = this.parseOptions(data);
     this.setState({ lakes: data, options });
   };
+
   async componentDidMount() {
     this.map = L.map("map", {
       preferCanvas: true,
