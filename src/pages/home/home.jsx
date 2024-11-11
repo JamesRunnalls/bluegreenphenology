@@ -35,7 +35,7 @@ class Image extends Component {
           <div className="title">{title}</div>
           <img
             alt={name}
-            title={fullscreen ? "Close Image" : "View Large Image"}
+            title={info === "" ? "View Large Image" : info}
             src={`${base_url}/Lake_${id}_${name}.png`}
             onError={this.hide}
             onClick={this.fullscreen}
@@ -55,12 +55,12 @@ class ShowImages extends Component {
       {
         name: "wShedDistReg",
         title: "Land phenology",
-        info: "",
+        info: "Trends in greenup, maturity, senescence and dormancy of vegetation in the lake’s catchment, derived from MODIS data in 2001-2018.",
       },
       {
         name: "lakePhenoMETDistReg",
         title: "Lake phenology",
-        info: "",
+        info: "Trends in the timing of annually recurring phytoplankton bloom peaks, derived from MERIS data in 2002-2010 and the cluster analysis below.",
       },
       {
         name: "lakePhenoMETLakeFrac",
@@ -70,12 +70,12 @@ class ShowImages extends Component {
       {
         name: "scatterLakeStartEndPeak",
         title: "Timing of chlorophyll in- and decrease",
-        info: "",
+        info: "Counts of pixels with a given mid-greenup and mid-greendown date retrieved from interpolated MERIS time series.",
       },
       {
         name: "scatterLakeStartEndPeak_simClust",
         title: "Clusters of overlap in timing",
-        info: "",
+        info: "Colors represent clusters of pixels with a similar bloom timing. The timing of these blooms in individual years is shown above under ‘Lake phenology’. Their spatial extent in all years is shown in the figures below.",
       },
       {
         name: "lakePhenoMETLakeFrac_1",
@@ -514,7 +514,9 @@ class Home extends Component {
           >
             <img src={eawag} alt="Eawag" />
           </a>
-          <div className="contact">For more information, please contact jelle.lever@eawag.ch</div>
+          <div className="contact">
+            For more information, please contact jelle.lever@eawag.ch
+          </div>
         </div>
       </React.Fragment>
     );
